@@ -13,7 +13,7 @@ from connaisseur.exceptions import (
     UnexpectedCosignData,
     InvalidFormatException,
 )
-from connaisseur.crypto import load_key
+from connaisseur import crypto
 
 
 class CosignValidator(ValidatorInterface):
@@ -89,7 +89,11 @@ class CosignValidator(ValidatorInterface):
                 trust_data_type="dev.cosignproject.cosign/signature",
                 stderr=stderr,
             )
-        elif "Error: no matching signatures:\n\nmain.go:" in stderr:
+        elif (
+            "Error: no matching signatures:\n\nmain.go:" in stderr
+            or "Error: no matching signatures:\ncrypto/rsa: verification error"
+            in stderr
+        ):
             msg = 'No trust data for image "{image}".'
             raise NotFoundException(
                 message=msg,
@@ -166,7 +170,15 @@ class CosignValidator(ValidatorInterface):
 
         # key is ecdsa public key
         try:
-            pkey = load_key(key).to_pem()  # raises if invalid
+            pkey = crypto.load_key(key).to_pem()  # raises if invalid
+            return ["--key", "/dev/stdin"], {}, pkey
+        except ValueError:
+            pass
+
+        # key is rsa public key
+        try:
+            crypto.load_rsa_key(key)  # raises if invalid
+            pkey = key.encode()
             return ["--key", "/dev/stdin"], {}, pkey
         except ValueError:
             pass

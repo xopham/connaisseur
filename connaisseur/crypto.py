@@ -2,6 +2,8 @@ import hashlib
 import base64
 import binascii
 import ecdsa
+import rsa
+from pyasn1.error import PyAsn1Error
 
 
 def verify_signature(
@@ -24,4 +26,11 @@ def load_key(pem_key: str):
     try:
         return ecdsa.VerifyingKey.from_pem(pem_key)
     except (ecdsa.der.UnexpectedDER, binascii.Error, TypeError, AttributeError) as err:
+        raise ValueError from err
+
+
+def load_rsa_key(pem_key: str):
+    try:
+        return rsa.PublicKey.load_pkcs1_openssl_pem(pem_key)
+    except (ValueError, PyAsn1Error) as err:
         raise ValueError from err

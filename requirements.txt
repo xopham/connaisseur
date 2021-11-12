@@ -10,3 +10,4 @@ PyYAML~=6.0
 aiohttp~=3.7.4.post0
 Jinja2~=3.0.3
 cheroot~=8.5.2
+rsa~=4.7.2

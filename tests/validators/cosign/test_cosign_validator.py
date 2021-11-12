@@ -348,6 +348,25 @@ def test_invoke_cosign_timeout_expired(
             fix.no_exc(),
         ),
         (
+            (
+                "-----BEGIN PUBLIC KEY-----\n"
+                "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvnReRPdqtEAdg18WEao+\n"
+                "NN0DSCxDjFS/MoJzSWc7G6oeakp0UHeCbBTW9V2yNqF4jbLrUhgiIl+dkKw0nqS0\n"
+                "kyD95Wv/Dl2vcHo87GqcFuFgrOpPibxtIgCy2s4hr7wRPAv+CyOfQZTNEAjKEZak\n"
+                "+RzoevsNlA2kZbpGnUSZeaMEIBD0M9GtxTXJBWhFcR9gtyz8n6MU9J1QkZgBUPSd\n"
+                "l1B/14bnehgeC5D26Ssk2wjVqAq1FEv0u0N9CczEDkLhQJ7MEChjVFN7B32u/J+d\n"
+                "6Cjzhk/S8RYOzefXHFuPGeAnEPFCvW1gXaiGDkl/EM+fC4kFAUm1xmFBQPz21sk7\n"
+                "OQIDAQAB\n"
+                "-----END PUBLIC KEY-----\n"
+            ),
+            (
+                ["--key", "/dev/stdin"],
+                {},
+                b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvnReRPdqtEAdg18WEao+\nNN0DSCxDjFS/MoJzSWc7G6oeakp0UHeCbBTW9V2yNqF4jbLrUhgiIl+dkKw0nqS0\nkyD95Wv/Dl2vcHo87GqcFuFgrOpPibxtIgCy2s4hr7wRPAv+CyOfQZTNEAjKEZak\n+RzoevsNlA2kZbpGnUSZeaMEIBD0M9GtxTXJBWhFcR9gtyz8n6MU9J1QkZgBUPSd\nl1B/14bnehgeC5D26Ssk2wjVqAq1FEv0u0N9CczEDkLhQJ7MEChjVFN7B32u/J+d\n6Cjzhk/S8RYOzefXHFuPGeAnEPFCvW1gXaiGDkl/EM+fC4kFAUm1xmFBQPz21sk7\nOQIDAQAB\n-----END PUBLIC KEY-----\n",
+            ),
+            fix.no_exc(),
+        ),
+        (
             "123step123step",
             ([], {}, b""),
             pytest.raises(exc.InvalidFormatException, match=r".*Public key.*"),
