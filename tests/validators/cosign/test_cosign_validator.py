@@ -348,6 +348,11 @@ def test_invoke_cosign_timeout_expired(
             fix.no_exc(),
         ),
         (
+            "hello@conny.dev",
+            (["--cert-email", "hello@conny.dev"], {"COSIGN_EXPERIMENTAL": "1"}, b""),
+            fix.no_exc(),
+        ),
+        (
             "123step123step",
             ([], {}, b""),
             pytest.raises(exc.InvalidFormatException, match=r".*Public key.*"),

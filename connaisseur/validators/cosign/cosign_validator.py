@@ -175,6 +175,10 @@ class CosignValidator(ValidatorInterface):
         if re.match(r"^\w{2,20}\:\/\/[\w:\/-]{3,255}$", key):
             return ["--key", key], {}, b""
 
+        # key is email for OIDC key
+        if re.match(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)", key):
+            return ["--cert-email", key], {"COSIGN_EXPERIMENTAL": "1"}, b""
+
         msg = "Public key (reference) '{input_str}' does not match expected patterns."
         raise InvalidFormatException(message=msg, input_str=key)
 
