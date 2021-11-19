@@ -55,7 +55,7 @@ The upper `deployment` section offers some general Kubernetes typical configurat
 Noteworthy configurations are:
 
 - `deployment.failurePolicy`: Failure policy allows configuration whether the mutating admission webhook should fail closed (`Fail`, *default*) or open (`Ignore`) should the Connaisseur service become unavailable. While Connaisseur is configured to be secure by default, setting the [failure policy](https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#failure-policy) to `Ignore` allows to prioritize cluster access[^1].
-- `deployment.securityContext`: Connaisseur ships with secure defaults. However, some keys are not supported by all versions or flavors of Kubernetes and might need adjustment[^2]. This is mentioned in the comments to the best of our knowledge.
+- `deployment.securityContext`: Connaisseur ships with secure defaults. However, some keys are not supported by all versions or flavors of Kubernetes and might need adjustment[^2] for production use. This is mentioned in the comments to the best of our knowledge.
 - `deployment.podSecurityPolicy`: Some clusters require a PSP. A secure default PSP for Connaisseur is available.
 
 [^1]: This is not to be confused with the [detection mode](features/detection_mode.md) feature: In detection mode, Conaisseur service admits all requests to the cluster independent of the validation result while the failure policy only takes effect when the service itself becomes unavailable.
