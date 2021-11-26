@@ -46,7 +46,7 @@ class CosignValidator(ValidatorInterface):
         self, image: Image, trust_root: str = None, **kwargs
     ):  # pylint: disable=arguments-differ
 
-        threshold = kwargs.get('threshold', 1)
+        threshold = kwargs.get('threshold', len(self.trust_roots))
         required = kwargs.get('required', [])
         logging.warning(threshold)
         logging.warning(required)
@@ -210,12 +210,10 @@ class CosignValidator(ValidatorInterface):
 
         TODO: Raises Exception if not compliant
         """
-#        threshold = 2
-#        required = ['bob', 'charlie']
 
-        # test threshold
+        # verify threshold
         signed_digests = [k['digests'] for i,k in roots.items() if k['digests'] is not None]
-        # verify that same digest present 'threshold' times
+        # check that same digest present 'threshold' times
         if not len(set(signed_digests)) == 1 or not len(signed_digests) >= threshold:
             msg = "Image not compliant to validation policy (threshold of '{threshold}' not reached)"
             raise ValidationError(
