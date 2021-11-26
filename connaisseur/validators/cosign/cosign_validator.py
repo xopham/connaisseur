@@ -27,6 +27,7 @@ class CosignValidator(ValidatorInterface):
         self.trust_roots = trust_roots
 
     def __get_key(self, key_name: str = None):
+        logging.warning(self.trust_roots)
         key_name = key_name or "default"
         try:
             key = next(
@@ -37,13 +38,33 @@ class CosignValidator(ValidatorInterface):
             raise NotFoundException(
                 message=msg, key_name=key_name, validator_name=self.name
             ) from err
-        return "".join(key)
+
+        keys = {key_name:{'name':key_name, 'key':"".join(key)}}
+        return keys
 
     async def validate(
         self, image: Image, trust_root: str = None, **kwargs
     ):  # pylint: disable=arguments-differ
-        key = self.__get_key(trust_root)
-        return self.__get_cosign_validated_digests(str(image), key).pop()
+
+        threshold = kwargs.get('threshold', 1)
+        required = kwargs.get('required', [])
+        logging.warning(threshold)
+        logging.warning(required)
+
+        if trust_root == "*":
+            roots = {k['name']:{'name': k['name'], 'key': "".join(k['key'])} for k in self.trust_roots}
+        else:
+            roots = self.__get_key(trust_root)
+        logging.warning(roots)
+        for name, root in roots.items():
+            try:
+                roots[name]['digests'] = self.__get_cosign_validated_digests(str(image), root['key']).pop()
+            except Exception as err:
+                roots[name]['digests'] = None
+                logging.info(err)
+        logging.warning(roots)
+
+        return CosignValidator.__apply_policy(roots=roots, threshold=threshold, required=required)
 
     def __get_cosign_validated_digests(self, image: str, key: str):
         """
@@ -181,6 +202,46 @@ class CosignValidator(ValidatorInterface):
 
         msg = "Public key (reference) '{input_str}' does not match expected patterns."
         raise InvalidFormatException(message=msg, input_str=key)
+
+    @staticmethod
+    def __apply_policy(roots: dict, threshold: int, required: list):
+        """
+        TODO: applies the validation policy
+
+        TODO: Raises Exception if not compliant
+        """
+#        threshold = 2
+#        required = ['bob', 'charlie']
+
+        # test threshold
+        signed_digests = [k['digests'] for i,k in roots.items() if k['digests'] is not None]
+        # verify that same digest present 'threshold' times
+        if not len(set(signed_digests)) == 1 or not len(signed_digests) >= threshold:
+            msg = "Image not compliant to validation policy (threshold of '{threshold}' not reached)"
+            raise ValidationError(
+                message=msg,
+                trust_data_type="dev.cosignproject.cosign/signature",
+                stderr='TODO',
+                threshold=str(threshold),
+            )
+        else:
+            digest = set(signed_digests).pop()
+        logging.warning(digest)
+
+        # verify required signers
+        for signer in required:
+            logging.warning(roots[signer]['digests'])
+            if not roots[signer]['digests'] == digest:
+                msg = "Image not compliant to validation policy (missing required signer '{signer_name}')"
+                raise ValidationError(
+                    message=msg,
+                    trust_data_type="dev.cosignproject.cosign/signature",
+                    stderr='TODO',
+                    signer_name=signer,
+                )
+
+        return digest
+
 
     @property
     def healthy(self):
