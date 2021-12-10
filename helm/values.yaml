@@ -1,7 +1,7 @@
 # configure Connaisseur deployment
 deployment:
-  replicasCount: 3
-  image: securesystemsengineering/connaisseur:v2.3.0
+  replicasCount: 1
+  image: securesystemsengineering/connaisseur:v2.4.0
   imagePullPolicy: IfNotPresent
   failurePolicy: Fail  # use 'Ignore' to fail open if Connaisseur becomes unavailable
   resources:
@@ -65,16 +65,28 @@ validators:
   type: static
   approve: false
 # the `default` validator is used if no validator is specified in image policy
-- name: default
-  type: notaryv1  # or other supported validator (e.g. "cosign")
-  host: notary.docker.io # in case of notaryv1, configure the notary server to be used
+- name: multisign
+  type: cosign  # or other supported validator (e.g. "cosign")
   trust_roots:
   # # the `default` key is used if no key is specified in image policy
-  #- name: default
-  #  key: |  # enter your public key below
-  #    -----BEGIN PUBLIC KEY-----
-  #    <add your public key here>
-  #    -----END PUBLIC KEY-----
+  - name: alice
+    key: |  # enter your public key below
+      -----BEGIN PUBLIC KEY-----
+      MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEusIAt6EJ3YrTHdg2qkWVS0KuotWQ
+      wHDtyaXlq7Nhj8279+1u/l5pZhXJPW8PnGRRLdO5NbsuM6aT7pOcP100uw==
+      -----END PUBLIC KEY-----
+  - name: bob
+    key: |  # enter your public key below
+      -----BEGIN PUBLIC KEY-----
+      MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE01DasuXJ4rfzAEXsURSnbq4QzJ6o
+      EJ2amYV/CBKqEhhl8fDESxsmbdqtBiZkDV2C3znIwV16SsJlRRYO+UrrAQ==
+      -----END PUBLIC KEY-----
+  - name: charlie
+    key: |  # enter your public key below
+      -----BEGIN PUBLIC KEY-----
+      MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEEHBUYJVrH+aFYJPuryEkRyE6m0m4
+      ANj+o/oW5fLRiEiXp0kbhkpLJR1LSwKYiX5Toxe3ePcuYpcWZn8Vqe3+oA==
+      -----END PUBLIC KEY-----
   #cert: |  # in case the trust data host is using a self-signed certificate
   #  -----BEGIN CERTIFICATE-----
   #  ...
@@ -112,6 +124,11 @@ validators:
 # is applied. specify if and how images should be validated by which validator via the validator name.
 policy:
 - pattern: "*:*"
+  validator: multisign
+  with:
+    trust_root: "*"
+    threshold: 3
+    required: ["bob", "charlie"]
 - pattern: "docker.io/library/*:*"
   validator: dockerhub-basics
   with:
@@ -119,9 +136,7 @@ policy:
 - pattern: "k8s.gcr.io/*:*"
   validator: allow
 - pattern: "docker.io/securesystemsengineering/*:*"
-  validator: dockerhub-basics
-  with:
-    trust_root: securesystemsengineering-official
+  validator: allow
 
 # in detection mode, deployment will not be denied, but only prompted
 # and logged. this allows testing the functionality without
