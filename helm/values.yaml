@@ -126,9 +126,9 @@ policy:
 - pattern: "*:*"
   validator: multisign
   with:
-    trust_root: "*"
-    threshold: 3
-    required: ["bob", "charlie"]
+    trust_root: "*"  # wildcard "*" added to allow specifying all trust roots of a validator
+    threshold: 2  # minimum number of trust root signatures present for successfull verification
+    required: ["bob", "charlie"]  # required trust roots by name
 - pattern: "docker.io/library/*:*"
   validator: dockerhub-basics
   with:
