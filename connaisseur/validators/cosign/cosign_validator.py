@@ -39,32 +39,39 @@ class CosignValidator(ValidatorInterface):
                 message=msg, key_name=key_name, validator_name=self.name
             ) from err
 
-        keys = {key_name:{'name':key_name, 'key':"".join(key)}}
+        keys = {key_name: {"name": key_name, "key": "".join(key)}}
         return keys
 
     async def validate(
         self, image: Image, trust_root: str = None, **kwargs
     ):  # pylint: disable=arguments-differ
 
-        threshold = kwargs.get('threshold', len(self.trust_roots))
-        required = kwargs.get('required', [])
+        threshold = kwargs.get("threshold", len(self.trust_roots))
+        required = kwargs.get("required", [])
         logging.warning(threshold)
         logging.warning(required)
 
         if trust_root == "*":
-            roots = {k['name']:{'name': k['name'], 'key': "".join(k['key'])} for k in self.trust_roots}
+            roots = {
+                k["name"]: {"name": k["name"], "key": "".join(k["key"])}
+                for k in self.trust_roots
+            }
         else:
             roots = self.__get_key(trust_root)
         logging.warning(roots)
         for name, root in roots.items():
             try:
-                roots[name]['digests'] = self.__get_cosign_validated_digests(str(image), root['key']).pop()
+                roots[name]["digests"] = self.__get_cosign_validated_digests(
+                    str(image), root["key"]
+                ).pop()
             except Exception as err:
-                roots[name]['digests'] = None
+                roots[name]["digests"] = None
                 logging.info(err)
         logging.warning(roots)
 
-        return CosignValidator.__apply_policy(roots=roots, threshold=threshold, required=required)
+        return CosignValidator.__apply_policy(
+            roots=roots, threshold=threshold, required=required
+        )
 
     def __get_cosign_validated_digests(self, image: str, key: str):
         """
@@ -212,14 +219,16 @@ class CosignValidator(ValidatorInterface):
         """
 
         # verify threshold
-        signed_digests = [k['digests'] for i,k in roots.items() if k['digests'] is not None]
+        signed_digests = [
+            k["digests"] for i, k in roots.items() if k["digests"] is not None
+        ]
         # check that same digest present 'threshold' times
         if not len(set(signed_digests)) == 1 or not len(signed_digests) >= threshold:
             msg = "Image not compliant to validation policy (threshold of '{threshold}' not reached)"
             raise ValidationError(
                 message=msg,
                 trust_data_type="dev.cosignproject.cosign/signature",
-                stderr='TODO',
+                stderr="TODO",
                 threshold=str(threshold),
             )
         else:
@@ -228,18 +237,17 @@ class CosignValidator(ValidatorInterface):
 
         # verify required signers
         for signer in required:
-            logging.warning(roots[signer]['digests'])
-            if not roots[signer]['digests'] == digest:
+            logging.warning(roots[signer]["digests"])
+            if not roots[signer]["digests"] == digest:
                 msg = "Image not compliant to validation policy (missing required signer '{signer_name}')"
                 raise ValidationError(
                     message=msg,
                     trust_data_type="dev.cosignproject.cosign/signature",
-                    stderr='TODO',
+                    stderr="TODO",
                     signer_name=signer,
                 )
 
         return digest
-
 
     @property
     def healthy(self):
