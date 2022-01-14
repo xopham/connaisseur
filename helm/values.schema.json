@@ -282,7 +282,8 @@
         "properties": {
           "replicasCount": {
             "$id": "#/properties/deployment/properties/replicasCount",
-            "type": "integer",
+            "type": ["integer", "string"],
+            "pattern": "([0-9]*)",
             "title": "The replicasCount schema",
             "description": "The number of replicas of Connaisseur deployment. (https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#creating-a-deployment)",
             "examples": [
