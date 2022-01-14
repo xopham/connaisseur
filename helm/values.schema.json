@@ -1112,7 +1112,7 @@
         "$id": "#/properties/namespacedValidation",
         "type": "object",
         "title": "The namespacedValidation schema",
-        "description": "Allows restricting Connaisseur to selected namespaces only (either by selecting or disselecting namespaces for Connaisseur).",
+        "description": "Allows restricting Connaisseur to selected namespaces only (either by selecting or deselecting namespaces for Connaisseur).",
         "default": {
           "enabled": false
         },
