@@ -967,7 +967,7 @@
                         "title": "The auth secret schema",
                         "description": "Name of a Kubernetes secret containing authentication credentials.",
                         "examples": [
-                          "my-notary-auth-creds"
+                          "my-cosign-auth-creds"
                         ]
                       }
                     },
