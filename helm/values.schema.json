@@ -782,7 +782,7 @@
                   "is_acr": {
                     "$id": "#/properties/validators/items/anyOf/0/properties/is_acr",
                     "title": "The is_acr schema",
-                    "description": "Indicates whether the notary V1 instance is attached to an ACR (Azure Container Registry) as this requires slight adaptions in communication with the Notary instance.",
+                    "description": "Indicates whether the notary V1 instance is attached to an ACR (Azure Container Registry) as this requires slight adaptions in communication with the notary instance.",
                     "type": "boolean"
                   },
                   "cert": {
@@ -949,19 +949,19 @@
                     ]
                   },
                   "cert": {
-                    "$id": "#/properties/validators/items/anyOf/0/properties/cert",
+                    "$id": "#/properties/validators/items/anyOf/2/properties/cert",
                     "title": "The cert schema",
-                    "description": "TLS-certificate if using a notary V1 instance requiring a self-signed certificate.",
+                    "description": "TLS-certificate if using a registry requiring a self-signed certificate.",
                     "type": "string",
                     "pattern": "(?:-+BEGIN\\sCERTIFICATE[-]+)\n(?:(?:[A-Za-z0-9+\\/\\s])*={0,4})\n(?:-+END\\sCERTIFICATE[-]+)"
                   },
                   "auth": {
-                    "$id": "#/properties/validators/items/anyOf/0/properties/auth",
+                    "$id": "#/properties/validators/items/anyOf/2/properties/auth",
                     "type": "object",
-                    "title": "Authentication credentials if using a private cosign instance.",
+                    "title": "Authentication credentials if using a private registry instance.",
                     "properties": {
                       "secret": {
-                        "$id": "#/properties/validators/items/anyOf/0/properties/auth/properties/secret",
+                        "$id": "#/properties/validators/items/anyOf/2/properties/auth/properties/secret",
                         "type": "string",
                         "pattern": "[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*",
                         "title": "The auth secret schema",
