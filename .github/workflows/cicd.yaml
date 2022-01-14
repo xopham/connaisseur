@@ -27,6 +27,28 @@ jobs:
           name: images
           path: images
           retention-days: 1
+  
+  build2:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install yq
+        run: sudo snap install yq
+      - name: Build images
+        run: docker build --pull --build-arg COSIGN_VERSION=1.4.1 -f docker/Dockerfile -t docker.io/xoph/conny:${{ github.sha  }} .
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'docker.io/xoph/conny:${{ github.sha }}'
+          format: 'template'
+          template: '@/contrib/sarif.tpl'
+          output: 'trivy-results.sarif'
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v1
+        if: always() 
+        with:
+          sarif_file: 'trivy-results.sarif'
 
   black:
     runs-on: ubuntu-latest
