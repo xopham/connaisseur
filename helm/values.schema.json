@@ -1206,7 +1206,7 @@
         "$id": "#/properties/alerting",
         "type": "object",
         "title": "The alerting schema",
-        "description": "The alerting subblock allows linkage to third party entities receiving json-formatted POST requests as Connaisseur alerts.",
+        "description": "The alerting subblock allows linkage to third party entities receiving JSON-formatted POST requests as Connaisseur alerts.",
         "default": {},
         "examples": [
           {
