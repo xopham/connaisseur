@@ -10,20 +10,20 @@
       
       
       
-        <link rel="canonical" href="https://sse-secure-systems.github.io/connaisseur/develop/features/namespaced_validation/">
+        <link rel="canonical" href="https://sse-secure-systems.github.io/connaisseur/develop/features/automatic_update_approval/">
       
       
-        <link rel="prev" href="../detection_mode/">
+        <link rel="prev" href="../automatic_child_approval/">
       
       
-        <link rel="next" href="../automatic_child_approval/">
+        <link rel="next" href="../../threat_model/">
       
       <link rel="icon" href="../../assets/favicon.svg">
       <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.0.14">
     
     
       
-        <title>Namespaced Validation - CONNAISSEUR - Verify Container Image Signatures in Kubernetes</title>
+        <title>Automatic Unchanged Approval - CONNAISSEUR - Verify Container Image Signatures in Kubernetes</title>
       
     
     
@@ -71,7 +71,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#namespaced-validation" class="md-skip">
+        <a href="#automatic-unchanged-approval" class="md-skip">
           Skip to content
         </a>
       
@@ -129,7 +129,7 @@ You're not viewing the docs of the latest version.
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Namespaced Validation
+              Automatic Unchanged Approval
             
           </span>
         </div>
@@ -484,6 +484,34 @@ You're not viewing the docs of the latest version.
               
   
   
+  
+    <li class="md-nav__item">
+      <a href="../namespaced_validation/" class="md-nav__link">
+        Namespaced Validation
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../automatic_child_approval/" class="md-nav__link">
+        Automatic Child Approval
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
     
   
   
@@ -496,12 +524,12 @@ You're not viewing the docs of the latest version.
       
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
-          Namespaced Validation
+          Automatic Unchanged Approval
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <a href="./" class="md-nav__link md-nav__link--active">
-        Namespaced Validation
+        Automatic Unchanged Approval
       </a>
       
         
@@ -537,34 +565,6 @@ You're not viewing the docs of the latest version.
   
 </nav>
       
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../automatic_child_approval/" class="md-nav__link">
-        Automatic Child Approval
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../automatic_update_approval/" class="md-nav__link">
-        Automatic Unchanged Approval
-      </a>
     </li>
   
 
@@ -940,27 +940,22 @@ You're not viewing the docs of the latest version.
                   
 
 
-<h1 id="namespaced-validation">Namespaced Validation<a class="headerlink" href="#namespaced-validation" title="Permanent link">⚓︎</a></h1>
-<p>Namespaced validation allows restricting validation to specific namespaces.
-Connaisseur will only verify trust of images deployed to the configured namespaces.
-This can greatly support initial rollout by stepwise extending the validated namespaces or excluding specific namespaces for which signatures are unfeasible.</p>
-<blockquote>
-<p><img alt="⚠" class="twemoji" src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/26a0.svg" title=":warning:" /> Enabling namespaced validation, allows roles with edit permissions on namespaces to disable validation for those namespaces. <img alt="⚠" class="twemoji" src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/26a0.svg" title=":warning:" /></p>
-</blockquote>
-<p>Namespaced validation offers two modes:</p>
-<ul>
-<li><code>ignore</code>: ignore all namespaces with label <code>securesystemsengineering.connaisseur/webhook: ignore</code></li>
-<li><code>validate</code>: only validate namespaces with label <code>securesystemsengineering.connaisseur/webhook: validate</code></li>
-</ul>
-<p>The desired namespaces must be labelled accordingly, e.g. via:</p>
-<div class="highlight"><pre><span></span><code># either
-kubectl namespaces &lt;namespace&gt; securesystemsengineering.connaisseur/webhook=ignore
-# or
-kubectl namespaces &lt;namespace&gt; securesystemsengineering.connaisseur/webhook=validate
-</code></pre></div>
-<p>Configure namespaced validation via the <code>namespacedValidation</code> in <code>helm/values.yaml</code>.</p>
+<h1 id="automatic-unchanged-approval">Automatic Unchanged Approval<a class="headerlink" href="#automatic-unchanged-approval" title="Permanent link">⚓︎</a></h1>
+<p>With the feature <em>automatic unchanged approval</em> enabled, Connaisseur automatically approves any resource that is updated and doesn't change its image references.
+This is especially useful when handling long living resources, with potentially out-of-sync signature data, that still need to be scaled up and down.</p>
+<p>An example: When dealing with a deployment that has an image reference <code>image:tag</code>, this reference is updated by Connaisseur during signature validation to <code>image@sha256:123...</code>, to ensure the correct image is used by the deployment.
+When scaling up or down the deployment, the image reference <code>image@sha256:123...</code> is presented to Connaisseur, due to the updated definition.
+Over time the signature of the original <code>image:tag</code> may change and a new "correct" image is available at <code>image@sha256:456...</code>.
+If afterwards the deployment in scaled up or down, Connaisseur will try to validate the image reference <code>image@sha256:123...</code>, by looking for it inside the signature data it receives.
+Unfortunately this reference may no longer be present, due to signature updates and thus the whole scaling will be denied.</p>
+<p>With automatic unchanged approval enabled, this is no longer the case.
+The validation of <code>image@sha256:123...</code> will be skipped, as no different image is used.</p>
+<p>This obviously has security implications, since it's no longer guaranteed that resources that are updated, have fresh and up-to-date signatures.
+So use it with caution.
+For that reason the feature is also disabled by default.
+The creation of resources on the other hand remains unchanged and will enforce validation.</p>
 <h2 id="configuration-options">Configuration options<a class="headerlink" href="#configuration-options" title="Permanent link">⚓︎</a></h2>
-<p><code>namespacedValidation</code> in <code>helm/values.yaml</code> supports the following keys:</p>
+<p><code>automaticUnchangedApproval</code> in <code>helm/value.yaml</code> supports the following keys:</p>
 <table>
 <thead>
 <tr>
@@ -972,27 +967,16 @@ kubectl namespaces &lt;namespace&gt; securesystemsengineering.connaisseur/webhoo
 </thead>
 <tbody>
 <tr>
-<td><code>enabled</code></td>
+<td><code>automaticUnchangedApproval</code></td>
 <td>false</td>
 <td></td>
-<td><code>true</code> or <code>false</code>; enable namespaced validation otherwise images in all namespaces will be validated.</td>
-</tr>
-<tr>
-<td><code>mode</code></td>
-<td>ignore</td>
-<td></td>
-<td><code>ignore</code> or <code>validate</code>; configure mode of exclusion to either ignore all namespaces with label <code>securesystemsengineering.connaisseur/webhook</code> set to <code>ignore</code> or only validate namespaces with the label set to <code>validate</code>.</td>
+<td><code>true</code> or <code>false</code> ; when <code>true</code>, Connaisseur will enable automatic unchanged approval</td>
 </tr>
 </tbody>
 </table>
 <h2 id="example">Example<a class="headerlink" href="#example" title="Permanent link">⚓︎</a></h2>
 <p>In <code>helm/values.yaml</code>:</p>
-<div class="highlight"><pre><span></span><code>namespacedValidation:
-  enabled: true
-  mode: validate
-</code></pre></div>
-<p>Labelling target namespace to be validated:</p>
-<div class="highlight"><pre><span></span><code>kubectl namespaces validateme securesystemsengineering.connaisseur/webhook=validate
+<div class="highlight"><pre><span></span><code><span class="nt">automaticUnchangedApproval</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 </code></pre></div>
 
 

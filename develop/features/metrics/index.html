@@ -10,20 +10,20 @@
       
       
       
-        <link rel="canonical" href="https://sse-secure-systems.github.io/connaisseur/develop/features/namespaced_validation/">
+        <link rel="canonical" href="https://sse-secure-systems.github.io/connaisseur/develop/features/metrics/">
       
       
-        <link rel="prev" href="../detection_mode/">
+        <link rel="prev" href="../">
       
       
-        <link rel="next" href="../automatic_child_approval/">
+        <link rel="next" href="../alerting/">
       
       <link rel="icon" href="../../assets/favicon.svg">
       <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.0.14">
     
     
       
-        <title>Namespaced Validation - CONNAISSEUR - Verify Container Image Signatures in Kubernetes</title>
+        <title>Metrics - CONNAISSEUR - Verify Container Image Signatures in Kubernetes</title>
       
     
     
@@ -71,7 +71,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#namespaced-validation" class="md-skip">
+        <a href="#metrics" class="md-skip">
           Skip to content
         </a>
       
@@ -129,7 +129,7 @@ You're not viewing the docs of the latest version.
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Namespaced Validation
+              Metrics
             
           </span>
         </div>
@@ -442,11 +442,52 @@ You're not viewing the docs of the latest version.
               
   
   
+    
   
-    <li class="md-nav__item">
-      <a href="../metrics/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Metrics
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         Metrics
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    Example
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -484,59 +525,11 @@ You're not viewing the docs of the latest version.
               
   
   
-    
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          Namespaced Validation
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../namespaced_validation/" class="md-nav__link">
         Namespaced Validation
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#configuration-options" class="md-nav__link">
-    Configuration options
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#example" class="md-nav__link">
-    Example
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -912,13 +905,6 @@ You're not viewing the docs of the latest version.
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configuration-options" class="md-nav__link">
-    Configuration options
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#example" class="md-nav__link">
     Example
   </a>
@@ -940,59 +926,79 @@ You're not viewing the docs of the latest version.
                   
 
 
-<h1 id="namespaced-validation">Namespaced Validation<a class="headerlink" href="#namespaced-validation" title="Permanent link">⚓︎</a></h1>
-<p>Namespaced validation allows restricting validation to specific namespaces.
-Connaisseur will only verify trust of images deployed to the configured namespaces.
-This can greatly support initial rollout by stepwise extending the validated namespaces or excluding specific namespaces for which signatures are unfeasible.</p>
-<blockquote>
-<p><img alt="⚠" class="twemoji" src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/26a0.svg" title=":warning:" /> Enabling namespaced validation, allows roles with edit permissions on namespaces to disable validation for those namespaces. <img alt="⚠" class="twemoji" src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/26a0.svg" title=":warning:" /></p>
-</blockquote>
-<p>Namespaced validation offers two modes:</p>
-<ul>
-<li><code>ignore</code>: ignore all namespaces with label <code>securesystemsengineering.connaisseur/webhook: ignore</code></li>
-<li><code>validate</code>: only validate namespaces with label <code>securesystemsengineering.connaisseur/webhook: validate</code></li>
-</ul>
-<p>The desired namespaces must be labelled accordingly, e.g. via:</p>
-<div class="highlight"><pre><span></span><code># either
-kubectl namespaces &lt;namespace&gt; securesystemsengineering.connaisseur/webhook=ignore
-# or
-kubectl namespaces &lt;namespace&gt; securesystemsengineering.connaisseur/webhook=validate
-</code></pre></div>
-<p>Configure namespaced validation via the <code>namespacedValidation</code> in <code>helm/values.yaml</code>.</p>
-<h2 id="configuration-options">Configuration options<a class="headerlink" href="#configuration-options" title="Permanent link">⚓︎</a></h2>
-<p><code>namespacedValidation</code> in <code>helm/values.yaml</code> supports the following keys:</p>
-<table>
-<thead>
-<tr>
-<th>Key</th>
-<th>Default</th>
-<th>Required</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>enabled</code></td>
-<td>false</td>
-<td></td>
-<td><code>true</code> or <code>false</code>; enable namespaced validation otherwise images in all namespaces will be validated.</td>
-</tr>
-<tr>
-<td><code>mode</code></td>
-<td>ignore</td>
-<td></td>
-<td><code>ignore</code> or <code>validate</code>; configure mode of exclusion to either ignore all namespaces with label <code>securesystemsengineering.connaisseur/webhook</code> set to <code>ignore</code> or only validate namespaces with the label set to <code>validate</code>.</td>
-</tr>
-</tbody>
-</table>
+<h1 id="metrics">Metrics<a class="headerlink" href="#metrics" title="Permanent link">⚓︎</a></h1>
+<p>Connaisseur exposes metrics about usage of the <code>/mutate</code> endpoint and general information about the python process using <a href="https://pypi.org/project/prometheus-flask-exporter/">Prometheus Flask Exporter</a> through the <code>/metrics</code> endpoint.</p>
+<p>This for example allows visualizing the number of allowed or denied resource requests.</p>
 <h2 id="example">Example<a class="headerlink" href="#example" title="Permanent link">⚓︎</a></h2>
-<p>In <code>helm/values.yaml</code>:</p>
-<div class="highlight"><pre><span></span><code>namespacedValidation:
-  enabled: true
-  mode: validate
-</code></pre></div>
-<p>Labelling target namespace to be validated:</p>
-<div class="highlight"><pre><span></span><code>kubectl namespaces validateme securesystemsengineering.connaisseur/webhook=validate
+<div class="highlight"><pre><span></span><code># HELP python_gc_objects_collected_total Objects collected during gc
+# TYPE python_gc_objects_collected_total counter
+python_gc_objects_collected_total{generation=&quot;0&quot;} 4422.0
+python_gc_objects_collected_total{generation=&quot;1&quot;} 1866.0
+python_gc_objects_collected_total{generation=&quot;2&quot;} 0.0
+# HELP python_gc_objects_uncollectable_total Uncollectable object found during GC
+# TYPE python_gc_objects_uncollectable_total counter
+python_gc_objects_uncollectable_total{generation=&quot;0&quot;} 0.0
+python_gc_objects_uncollectable_total{generation=&quot;1&quot;} 0.0
+python_gc_objects_uncollectable_total{generation=&quot;2&quot;} 0.0
+# HELP python_gc_collections_total Number of times this generation was collected
+# TYPE python_gc_collections_total counter
+python_gc_collections_total{generation=&quot;0&quot;} 163.0
+python_gc_collections_total{generation=&quot;1&quot;} 14.0
+python_gc_collections_total{generation=&quot;2&quot;} 1.0
+# HELP python_info Python platform information
+# TYPE python_info gauge
+python_info{implementation=&quot;CPython&quot;,major=&quot;3&quot;,minor=&quot;10&quot;,patchlevel=&quot;2&quot;,version=&quot;3.10.2&quot;} 1.0
+# HELP process_virtual_memory_bytes Virtual memory size in bytes.
+# TYPE process_virtual_memory_bytes gauge
+process_virtual_memory_bytes 6.1161472e+07
+# HELP process_resident_memory_bytes Resident memory size in bytes.
+# TYPE process_resident_memory_bytes gauge
+process_resident_memory_bytes 4.595712e+07
+# HELP process_start_time_seconds Start time of the process since unix epoch in seconds.
+# TYPE process_start_time_seconds gauge
+process_start_time_seconds 1.6436681112e+09
+# HELP process_cpu_seconds_total Total user and system CPU time spent in seconds.
+# TYPE process_cpu_seconds_total counter
+process_cpu_seconds_total 3.3
+# HELP process_open_fds Number of open file descriptors.
+# TYPE process_open_fds gauge
+process_open_fds 12.0
+# HELP process_max_fds Maximum number of open file descriptors.
+# TYPE process_max_fds gauge
+process_max_fds 1.048576e+06
+# HELP exporter_info Information about the Prometheus Flask exporter
+# TYPE exporter_info gauge
+exporter_info{version=&quot;0.18.7&quot;} 1.0
+# HELP http_request_duration_seconds Flask HTTP request duration in seconds
+# TYPE http_request_duration_seconds histogram
+http_request_duration_seconds_bucket{le=&quot;0.1&quot;,method=&quot;POST&quot;,path=&quot;/mutate&quot;,status=&quot;200&quot;} 5.0
+http_request_duration_seconds_bucket{le=&quot;0.25&quot;,method=&quot;POST&quot;,path=&quot;/mutate&quot;,status=&quot;200&quot;} 5.0
+http_request_duration_seconds_bucket{le=&quot;0.5&quot;,method=&quot;POST&quot;,path=&quot;/mutate&quot;,status=&quot;200&quot;} 5.0
+http_request_duration_seconds_bucket{le=&quot;0.75&quot;,method=&quot;POST&quot;,path=&quot;/mutate&quot;,status=&quot;200&quot;} 8.0
+http_request_duration_seconds_bucket{le=&quot;1.0&quot;,method=&quot;POST&quot;,path=&quot;/mutate&quot;,status=&quot;200&quot;} 8.0
+http_request_duration_seconds_bucket{le=&quot;2.5&quot;,method=&quot;POST&quot;,path=&quot;/mutate&quot;,status=&quot;200&quot;} 9.0
+http_request_duration_seconds_bucket{le=&quot;+Inf&quot;,method=&quot;POST&quot;,path=&quot;/mutate&quot;,status=&quot;200&quot;} 9.0
+http_request_duration_seconds_count{method=&quot;POST&quot;,path=&quot;/mutate&quot;,status=&quot;200&quot;} 9.0
+http_request_duration_seconds_sum{method=&quot;POST&quot;,path=&quot;/mutate&quot;,status=&quot;200&quot;} 3.6445974350208417
+# HELP http_request_duration_seconds_created Flask HTTP request duration in seconds
+# TYPE http_request_duration_seconds_created gauge
+http_request_duration_seconds_created{method=&quot;POST&quot;,path=&quot;/mutate&quot;,status=&quot;200&quot;} 1.643668194758098e+09
+# HELP http_request_total Total number of HTTP requests
+# TYPE http_request_total counter
+http_request_total{method=&quot;POST&quot;,status=&quot;200&quot;} 9.0
+# HELP http_request_created Total number of HTTP requests
+# TYPE http_request_created gauge
+http_request_created{method=&quot;POST&quot;,status=&quot;200&quot;} 1.6436681947581613e+09
+# HELP http_request_exceptions_total Total number of HTTP requests which resulted in an exception
+# TYPE http_request_exceptions_total counter
+# HELP mutate_requests_total Total number of mutate requests
+# TYPE mutate_requests_total counter
+mutate_requests_total{allowed=&quot;False&quot;,status_code=&quot;403&quot;} 4.0
+mutate_requests_total{allowed=&quot;True&quot;,status_code=&quot;202&quot;} 5.0
+# HELP mutate_requests_created Total number of mutate requests
+# TYPE mutate_requests_created gauge
+mutate_requests_created{allowed=&quot;False&quot;,status_code=&quot;403&quot;} 1.643760946491879e+09
+mutate_requests_created{allowed=&quot;True&quot;,status_code=&quot;202&quot;} 1.6437609592007663e+09
 </code></pre></div>
 
 
