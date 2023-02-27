@@ -15,8 +15,7 @@ jobs:
           image-names: connaisseur-test
           cut-off: three weeks ago UTC+1
           timestamp-to-use: updated_at
-          account-type: org
-          org-name: sse-secure-systems
+          account-type: personal
           token: ${{ secrets.GHCR_PAT }}
       - name: Cleanup dangling images without tag
         uses: snok/container-retention-policy@482ce28159f65a8bfad986da1fedcef40169aa75 # v2.0.0
@@ -25,8 +24,7 @@ jobs:
           untagged-only: true
           cut-off: four hours ago UTC+1
           timestamp-to-use: updated_at
-          account-type: org
-          org-name: sse-secure-systems
+          account-type: personal
           token: ${{ secrets.GHCR_PAT }}
       - name: Cleanup all connaisseur images
         uses: snok/container-retention-policy@482ce28159f65a8bfad986da1fedcef40169aa75 # v2.0.0
@@ -35,6 +33,5 @@ jobs:
           skip-tags: master, develop, v*, sha256-*
           cut-off: four days ago UTC+1
           timestamp-to-use: updated_at
-          account-type: org
-          org-name: sse-secure-systems
+          account-type: personal
           token: ${{ secrets.GHCR_PAT }}
