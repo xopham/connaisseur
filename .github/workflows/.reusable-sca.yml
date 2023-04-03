@@ -97,7 +97,7 @@ jobs:
           username: ${{ inputs.repo_owner }}
           password: ${{ inputs.repo_token }}
       - name: Run
-        uses: anchore/sbom-action@07978da4bdb4faa726e52dfc6b1bed63d4b56479 # v0.13.3
+        uses: anchore/sbom-action@422cb34a0f8b599678c41b21163ea6088edb2624 # v0.14.1
         with:
           image: ${{ inputs.image }}
           format: cyclonedx-json
